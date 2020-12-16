@@ -24,7 +24,8 @@ def create_csv():
     dbConnection = create_engine(con_string)
     dbConnection.connect()
 
-    ## mysql query
+    ## mysql query 
+    # need to get from config json
     query = """
     SELECT vc.name, vc.email, vc.`type`, vc.user_id, vc.created_at, vc.borned_at, COUNT(vo.finished_at) as "pedidos_finalizados", DATE_FORMAT(max(vo.finished_at), '%Y-%m-%d') as "ultimo_pedido"
     FROM ebdb.view_customers vc 
