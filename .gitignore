@@ -1,6 +1,8 @@
 ## default folders of the project
-/__pycache__
-/.*
+__pycache__/
+.*
+
+*/__pycache__/
 
 ## sensitive accesss
 /config
