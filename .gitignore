@@ -1,6 +1,6 @@
-/config
 /__pycache__
-/.vscode
 /.ipynb_checkpoints
-send_to_drive.ipynb
-database.csv
+/.vscode
+/config
+/database.csv
+/notebook.ipynb
