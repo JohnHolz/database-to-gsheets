@@ -1,5 +1,5 @@
-from modules.from_csv_to_gs import send_csv
-from modules.from_db_to_csv import create_csv
+from modules.csv_to_gs import send_csv
+from modules.db_to_csv import create_csv
 
 def main():
     ## make query and write as csv in current directory
