@@ -27,7 +27,7 @@ def create_csv():
     ## mysql query 
     # need to get from config json
     query = """
-    SELECT vc.name, vc.email, vc.`type`, vc.user_id, vc.created_at, vc.borned_at, COUNT(vo.finished_at) as "pedidos_finalizados", DATE_FORMAT(max(vo.finished_at), '%Y-%m-%d') as "ultimo_pedido"
+    SELECT vc.name, vc.email, vc.`type`, phone, vc.user_id, vc.created_at, vc.borned_at, COUNT(vo.finished_at) as "pedidos_finalizados", DATE_FORMAT(max(vo.finished_at), '%Y-%m-%d') as "ultimo_pedido"
     FROM ebdb.view_customers vc 
     Left join ebdb.view_orders vo on vo.customer_email = vc.email and vo.status = "F"
     GROUP by vc.email
