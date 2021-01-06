@@ -4,7 +4,9 @@
 
 ## sensitive accesss
 /config
+/data
 
 ## remove csvs and notebooks
 *.csv
 *.ipynb
+.**
