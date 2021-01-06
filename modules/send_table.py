@@ -2,7 +2,7 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-def send_csv():
+def send_csv(file = 'data/database.csv'):
     ## default scope
     scope = ["https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
              "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"]
@@ -17,7 +17,7 @@ def send_csv():
     spreadsheet = client.open('database_perpetuo_pinn')
 
     ## reading file
-    with open('database.csv', 'r') as file_obj:
+    with open(file, 'r') as file_obj:
         content = file_obj.read()
 
     ## sending csv
