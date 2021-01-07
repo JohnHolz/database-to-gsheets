@@ -3,7 +3,8 @@ import re
 
 def correct_email(email):
     if '@' in email:
-        if email.split('@')[1] in zanota_emails['wrong'].tolist():
+        domain = email.split('@')[1]
+        if domain in zanota_emails['wrong'].tolist():
             email = email.replace(domain, zanota_emails['right'].iloc[zanota_emails[zanota_emails['wrong']==domain].index.values[0]])
         return email
 
@@ -58,7 +59,7 @@ def transform():
     ## cleanning special characters
     table['name'] = table['name'].str.replace('[^\w\s#@/:%.,_-]', '', flags=re.UNICODE)
     table['email']= table['email'].str.lower()
-    table['email']= table['email'].apply(correct_email,axis=1)
+    table['email']= table['email'].apply(correct_email)
     table['name'] = table['name'].str.lower()
     table['name'] = table['name'].str.title()
     table['created_at'] = pd.to_datetime(table['created_at']).dt.strftime('%d/%m/%Y')
