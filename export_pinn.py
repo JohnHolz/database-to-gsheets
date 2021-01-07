@@ -1,7 +1,6 @@
 from modules.get_data import db_data
 from modules.send_table import send_csv
 from modules.transform_data import transform
-import pandas as pd
 
 def main():
     # Get data
