@@ -27,6 +27,16 @@ def transform():
     ## filter just finished status
     orders = orders[orders.status == 'F']
 
+    ## ultimos pedidos
+    ultimos_pedidos = orders[['customer_id','finished_at']].groupby('customer_id').max().reset_index()
+    ultimos_pedidos.columns = ['customer_id', 'ultimo pedido']
+    table = table.merge(ultimos_pedidos, how='left',left_on = 'id',right_on = 'customer_id')
+
+    ## qtd de pedidos
+    qtds_pedidos = orders[['customer_id','id']].groupby('customer_id').count().reset_index()
+    qtds_pedidos.columns = ['customer_id','qtd de pedidos']
+    table = table.merge(qtds_pedidos, how='left',left_on = 'id',right_on = 'customer_id')
+
     ## adding vouchers columns
     vouchers = ['FRETEGRATIS','PRIMEIRACOMPRA','QUERO15']
 
@@ -40,16 +50,6 @@ def transform():
         temp = pivot[pivot.voucher == i].groupby('customer_id').count().reset_index()
         temp.columns = ['customer_id',i]
         table = table.merge(temp, how='left',left_on = 'id',right_on = 'customer_id')
-
-    ## ultimos pedidos
-    ultimos_pedidos = orders[['customer_id','finished_at']].groupby('customer_id').max().reset_index()
-    ultimos_pedidos.columns = ['customer_id', 'ultimo pedido']
-    table = table.merge(ultimos_pedidos, how='left',left_on = 'id',right_on = 'customer_id')
-
-    ## qtd de pedidos
-    qtds_pedidos = orders[['customer_id','id']].groupby('customer_id').count().reset_index()
-    qtds_pedidos.columns = ['customer_id','qtd de pedidos']
-    table = table.merge(qtds_pedidos, how='left',left_on = 'id',right_on = 'customer_id')
 
     ## remove customer_id columns  
     string = 'customer_id'
