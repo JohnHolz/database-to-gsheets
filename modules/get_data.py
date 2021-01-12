@@ -27,3 +27,4 @@ def db_data(query, csv_name):
     dbConnection.connect()
     table = pd.read_sql(query, dbConnection)
     table.to_csv('data/{}.csv'.format(csv_name),index=False)
+    print(csv_name + ' created')
