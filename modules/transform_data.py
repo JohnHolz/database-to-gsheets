@@ -66,6 +66,5 @@ def transform():
     table['borned_at'] = pd.to_datetime(table['borned_at']).dt.strftime('%d/%m/%Y')
     table['ultimo pedido'] = pd.to_datetime(table['ultimo pedido']).dt.strftime('%d/%m/%Y')
 
-    ## creating csv to next script
-    table.to_csv('data/database.csv',sep=',',index=False)
-    print("database.csv created: {} lines, {} rows".format(table.shape[0],table.shape[1]))
+    print('transformed')
+    return table

@@ -12,10 +12,11 @@ def main():
     db_data(query_orders,'raw_database_orders')
 
     # transform data
-    transform()
+    df = transform()
 
     ## send data
-    send_csv()
+    send_csv(df)
 
 if __name__ == "__main__":
     main()
+
