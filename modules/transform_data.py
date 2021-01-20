@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+from datetime import date
 
 def correct_email(email):
     if '@' in email:
@@ -13,22 +14,29 @@ zanota_emails = pd.DataFrame(zanota_ls)
 zanota_emails.columns = ['wrong','right']
 
 def transform():
+    date_format = '%Y-%m-%d'
+
     ## reading raw data
     customers = pd.read_csv('data/raw_database_customers.csv')
     orders = pd.read_csv('data/raw_database_orders.csv')
 
     ## keep columns to output table
-    keep_columns = ['id', 'name', 'email', 'type', 'phone', 'user_id', 'created_at', 'borned_at']
+    keep_columns = ['id', 'name', 'email', 'type', 'phone', 'user_id', 'created_at']
     table = customers[keep_columns]
 
     ## remove others
-    orders = orders[['id','customer_id', 'voucher','finished_at','status']]
+    orders = orders[['id','customer_id', 'voucher','created_at','status']]
 
     ## filter just finished status
     orders = orders[orders.status == 'F']
 
+    ## primeiros pedidos
+    primeiros_pedidos = orders[['customer_id','created_at']].groupby('customer_id').min().reset_index()
+    primeiros_pedidos.columns = ['customer_id', 'primeiro pedido']
+    table = table.merge(primeiros_pedidos, how='left',left_on = 'id',right_on = 'customer_id')
+
     ## ultimos pedidos
-    ultimos_pedidos = orders[['customer_id','finished_at']].groupby('customer_id').max().reset_index()
+    ultimos_pedidos = orders[['customer_id','created_at']].groupby('customer_id').max().reset_index()
     ultimos_pedidos.columns = ['customer_id', 'ultimo pedido']
     table = table.merge(ultimos_pedidos, how='left',left_on = 'id',right_on = 'customer_id')
 
@@ -37,9 +45,22 @@ def transform():
     qtds_pedidos.columns = ['customer_id','qtd de pedidos']
     table = table.merge(qtds_pedidos, how='left',left_on = 'id',right_on = 'customer_id')
 
+    ## cleanning special characters
+    table['name'] = table['name'].str.replace('[^\w\s#@/:%.,_-]', '', flags=re.UNICODE)
+    table['email']= table['email'].str.lower()
+    table['email']= table['email'].apply(correct_email)
+    table['name'] = table['name'].str.lower()
+    table['name'] = table['name'].str.title()
+    table['created_at'] = pd.to_datetime(table['created_at']).dt.strftime(date_format)
+    # table['borned_at'] = pd.to_datetime(table['borned_at']).dt.strftime('%d/%m/%Y')
+    table['dias sem pedir'] = pd.to_datetime('today') - pd.to_datetime(table[table['ultimo pedido'].isna()!=True]['ultimo pedido'])
+    table['dias sem pedir'] = table['dias sem pedir'].apply(lambda x: str(x).split('days')[0])
+    table['dias sem pedir'] = table['dias sem pedir'].apply(lambda x : '' if x=="NaT" else x)
+    table['primeiro pedido'] = pd.to_datetime(table['primeiro pedido']).dt.strftime(date_format)
+    table['ultimo pedido'] = pd.to_datetime(table['ultimo pedido']).dt.strftime(date_format)
+
     ## adding vouchers columns
     vouchers = ['FRETEGRATIS','PRIMEIRACOMPRA','QUERO15']
-
     ## filter table with vouchers
     pivot = orders[orders['voucher'].isin(vouchers)]
 
@@ -55,16 +76,6 @@ def transform():
     string = 'customer_id'
     cols = [c for c in table.columns if c.lower()[:len(string)] != string]
     table=table[cols]
-
-    ## cleanning special characters
-    table['name'] = table['name'].str.replace('[^\w\s#@/:%.,_-]', '', flags=re.UNICODE)
-    table['email']= table['email'].str.lower()
-    table['email']= table['email'].apply(correct_email)
-    table['name'] = table['name'].str.lower()
-    table['name'] = table['name'].str.title()
-    table['created_at'] = pd.to_datetime(table['created_at']).dt.strftime('%d/%m/%Y')
-    table['borned_at'] = pd.to_datetime(table['borned_at']).dt.strftime('%d/%m/%Y')
-    table['ultimo pedido'] = pd.to_datetime(table['ultimo pedido']).dt.strftime('%d/%m/%Y')
 
     print('transformed')
     return table
